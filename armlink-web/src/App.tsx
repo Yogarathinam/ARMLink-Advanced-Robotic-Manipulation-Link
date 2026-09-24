@@ -8,7 +8,7 @@ import { GamepadPanel } from './components/GamepadPanel';
 import { IKPanel } from './components/IKPanel';
 import { SequencePlayer } from './components/SequencePlayer';
 import { CalibrationWizard } from './components/CalibrationWizard';
-import { Activity, ShieldCheck, Compass, Terminal, Eye } from 'lucide-react';
+import { Activity, ShieldCheck, Compass, Terminal } from 'lucide-react';
 import './App.css';
 
 export function App() {
@@ -41,10 +41,6 @@ export function App() {
               isIKMode={storeState.controlMode === 'ik'}
               theme={storeState.theme}
             />
-
-            <div className="canvas-overlay-badge">
-              <Eye size={14} /> 3D DIGITAL TWIN • 60 FPS
-            </div>
 
             <div className="telemetry-bar">
               <div className="telemetry-item">
