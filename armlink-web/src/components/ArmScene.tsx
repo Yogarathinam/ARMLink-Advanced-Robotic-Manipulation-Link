@@ -61,11 +61,11 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
 
     // 1. Scene Setup
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(theme === 'light' ? '#f8f9fa' : '#090d16');
+    scene.background = new THREE.Color(theme === 'light' ? '#f1f5f9' : '#07090e');
     sceneRef.current = scene;
 
     // 2. Camera Setup
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 1200);
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1200);
     camera.position.set(290, 230, 290);
     camera.lookAt(0, 95, 0);
     cameraRef.current = camera;
@@ -77,41 +77,49 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.1;
+    renderer.toneMappingExposure = 1.2;
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // 4. Studio Lighting System (Key, Fill, Rim, Ambient)
-    const ambientLight = new THREE.AmbientLight(0xffffff, theme === 'light' ? 0.9 : 0.65);
+    // 4. High-Visibility Studio Lighting (Ambient + Hemisphere + Key + Fill + Rim)
+    const ambientLight = new THREE.AmbientLight(0xffffff, theme === 'light' ? 1.0 : 0.7);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
-    keyLight.position.set(160, 280, 160);
+    const hemiLight = new THREE.HemisphereLight(
+      theme === 'light' ? 0xffffff : 0x2563eb,
+      theme === 'light' ? 0xe2e8f0 : 0x090d16,
+      1.2
+    );
+    hemiLight.position.set(0, 300, 0);
+    scene.add(hemiLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.0);
+    keyLight.position.set(180, 300, 180);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 2048;
     keyLight.shadow.mapSize.height = 2048;
     keyLight.shadow.bias = -0.0001;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x0b57d0, 0.6);
-    fillLight.position.set(-160, 120, -160);
+    const fillLight = new THREE.DirectionalLight(0x2563eb, 0.9);
+    fillLight.position.set(-180, 150, -180);
     scene.add(fillLight);
 
-    const rimLight = new THREE.PointLight(0x00f0ff, 1.2, 500);
+    const rimLight = new THREE.PointLight(0x00f0ff, 1.5, 500);
     rimLight.position.set(0, 300, -200);
     scene.add(rimLight);
 
-    // 5. Ground Floor & Concentric Marking Rings
+    // 5. Studio Ground Floor & Marking Rings
     if (showGrid) {
-      const gridColor = theme === 'light' ? 0x0b57d0 : 0x00f0ff;
-      const gridLines = theme === 'light' ? 0xd0d7de : 0x1e293b;
+      const gridColor = theme === 'light' ? 0x2563eb : 0x00f0ff;
+      const gridLines = theme === 'light' ? 0xcbcbcb : 0x1e293b;
       const grid = new THREE.GridHelper(440, 44, gridColor, gridLines);
       grid.position.y = 0;
       scene.add(grid);
 
       // Work Zone Ring
-      const ringGeo = new THREE.RingGeometry(180, 182, 64);
-      const ringMat = new THREE.MeshBasicMaterial({ color: gridColor, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
+      const ringGeo = new THREE.RingGeometry(180, 183, 64);
+      const ringMat = new THREE.MeshBasicMaterial({ color: gridColor, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
       const ringMesh = new THREE.Mesh(ringGeo, ringMat);
       ringMesh.rotation.x = Math.PI / 2;
       ringMesh.position.y = 0.5;
@@ -124,44 +132,48 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
       scene.add(axesHelper);
     }
 
-    // 6. Curated Metallic Materials
+    // 6. High-Visibility Vibrant Industrial Materials
     const darkMetalMat = new THREE.MeshStandardMaterial({
-      color: theme === 'light' ? 0x24292e : 0x161b22,
-      metalness: 0.85,
+      color: theme === 'light' ? 0x1e293b : 0x0f172a, // Deep Slate Black
+      metalness: 0.8,
       roughness: 0.25
     });
 
     const bodyArmourMat = new THREE.MeshStandardMaterial({
-      color: theme === 'light' ? 0x0b57d0 : 0x1a73e8,
+      color: theme === 'light' ? 0x1565c0 : 0x2563eb, // High-contrast Vivid Cobalt/Sapphire Blue
       metalness: 0.6,
-      roughness: 0.3,
-      emissive: 0x041e49,
-      emissiveIntensity: 0.15
+      roughness: 0.2,
+      emissive: 0x0d47a1,
+      emissiveIntensity: theme === 'light' ? 0.15 : 0.35
     });
 
     const brassBearingMat = new THREE.MeshStandardMaterial({
-      color: 0xd97706,
+      color: 0xf59e0b, // Bright Vibrant Gold/Amber Brass
       metalness: 0.9,
-      roughness: 0.15
+      roughness: 0.15,
+      emissive: 0x78350f,
+      emissiveIntensity: 0.2
     });
 
     const chromeBoltMat = new THREE.MeshStandardMaterial({
-      color: 0xe2e8f0,
+      color: 0xf8fafc, // Platinum Chrome
       metalness: 0.95,
       roughness: 0.1
     });
 
-    const rubberGripMat = new THREE.MeshStandardMaterial({
-      color: 0xd93025,
-      metalness: 0.2,
-      roughness: 0.6
+    const gripperMat = new THREE.MeshStandardMaterial({
+      color: 0xff3b30, // Bright Safety Red Jaw Pads
+      metalness: 0.3,
+      roughness: 0.3,
+      emissive: 0x991b1b,
+      emissiveIntensity: 0.25
     });
 
     const intersectables: THREE.Mesh[] = [];
 
-    // Helper: Add decorative bolts to joint housings
+    // Helper: Add decorative bolts
     const addBoltHeads = (parentGroup: THREE.Group, radius: number, yPos: number, count = 6) => {
-      const boltGeo = new THREE.CylinderGeometry(2, 2, 2.5, 6);
+      const boltGeo = new THREE.CylinderGeometry(2.5, 2.5, 3, 6);
       for (let i = 0; i < count; i++) {
         const angle = (i / count) * Math.PI * 2;
         const bolt = new THREE.Mesh(boltGeo, chromeBoltMat);
@@ -171,28 +183,27 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     };
 
     // ------------------------------------------------------------------------
-    // 7. HIGH-DETAIL INDUSTRIAL 6-DOF ROBOTIC ARM ASSEMBLY
+    // 7. HIGH-VISIBILITY INDUSTRIAL ROBOTIC ARM ASSEMBLY
     // ------------------------------------------------------------------------
     
-    // BASE PEDESTAL (Fixed Mounting Plate)
-    const basePlateGeo = new THREE.CylinderGeometry(48, 52, 10, 8); // Octagonal flange
+    // BASE PEDESTAL
+    const basePlateGeo = new THREE.CylinderGeometry(48, 52, 10, 8);
     const basePlate = new THREE.Mesh(basePlateGeo, darkMetalMat);
     basePlate.position.y = 5;
     basePlate.receiveShadow = true;
     scene.add(basePlate);
 
-    // Mounting Bolts on Base Flange
     addBoltHeads(scene as any, 44, 10.5, 8);
 
     // Glowing Base LED Ring
-    const ledRingGeo = new THREE.TorusGeometry(32, 1.5, 16, 32);
+    const ledRingGeo = new THREE.TorusGeometry(32, 2, 16, 32);
     const ledRingMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
     const ledRing = new THREE.Mesh(ledRingGeo, ledRingMat);
     ledRing.rotation.x = Math.PI / 2;
     ledRing.position.y = 10.5;
     scene.add(ledRing);
 
-    // JOINT 1: Base Rotate Swivel Group
+    // JOINT 1: Base Swivel Group
     const j1Group = new THREE.Group();
     j1Group.position.y = 10;
     scene.add(j1Group);
@@ -215,20 +226,18 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
 
     addBoltHeads(j1Group, 26, 38.5, 6);
 
-    // JOINT 2: Shoulder Fork & Pivot Group
+    // JOINT 2: Shoulder Group
     const j2Group = new THREE.Group();
     j2Group.position.y = 38;
     j1Group.add(j2Group);
     jointsRef.current.j2ShoulderGroup = j2Group;
 
-    // Brass Bearings at Shoulder Pivot
     const shoulderBearingGeo = new THREE.CylinderGeometry(16, 16, 36, 24);
     const shoulderBearing = new THREE.Mesh(shoulderBearingGeo, brassBearingMat);
     shoulderBearing.rotation.z = Math.PI / 2;
     shoulderBearing.castShadow = true;
     j2Group.add(shoulderBearing);
 
-    // Upper Arm Main Structural Link (Dual Carbon/Aluminium Beams)
     const upperArmGroup = new THREE.Group();
     j2Group.add(upperArmGroup);
 
@@ -244,7 +253,6 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     beamRight.castShadow = true;
     upperArmGroup.add(beamRight);
 
-    // Upper Arm Core Armour Casing
     const upperCoreGeo = new THREE.BoxGeometry(14, 100, 16);
     const upperCore = new THREE.Mesh(upperCoreGeo, bodyArmourMat.clone());
     upperCore.position.set(0, 60, 0);
@@ -260,7 +268,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     upperArmGroup.add(upperCore);
     intersectables.push(upperCore);
 
-    // JOINT 3: Elbow Pivot Group
+    // JOINT 3: Elbow Group
     const j3Group = new THREE.Group();
     j3Group.position.y = 120;
     j2Group.add(j3Group);
@@ -272,7 +280,6 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     elbowBearing.castShadow = true;
     j3Group.add(elbowBearing);
 
-    // Forearm Tapered Shell Link (115 mm)
     const forearmGeo = new THREE.CylinderGeometry(12, 16, 115, 24);
     const forearm = new THREE.Mesh(forearmGeo, bodyArmourMat.clone());
     forearm.position.y = 57.5;
@@ -288,15 +295,15 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     j3Group.add(forearm);
     intersectables.push(forearm);
 
-    // Heat Sink Fins on Elbow Servo
+    // Heat Sink Fins
     for (let f = 0; f < 4; f++) {
-      const finGeo = new THREE.BoxGeometry(22, 2, 22);
+      const finGeo = new THREE.BoxGeometry(22, 2.5, 22);
       const fin = new THREE.Mesh(finGeo, darkMetalMat);
       fin.position.y = 40 + f * 6;
       j3Group.add(fin);
     }
 
-    // JOINT 4: Wrist Pitch Yoke Group
+    // JOINT 4: Wrist Pitch Group
     const j4Group = new THREE.Group();
     j4Group.position.y = 115;
     j3Group.add(j4Group);
@@ -317,7 +324,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     j4Group.add(wristPitchPivot);
     intersectables.push(wristPitchPivot);
 
-    // JOINT 5: Wrist Roll Rotary Collar
+    // JOINT 5: Wrist Roll Collar Group
     const j5Group = new THREE.Group();
     j5Group.position.y = 20;
     j4Group.add(j5Group);
@@ -338,13 +345,13 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     j5Group.add(wristRollCollar);
     intersectables.push(wristRollCollar);
 
-    // JOINT 6: Gripper Base & Parallel Jaws
+    // JOINT 6: Gripper Base & Jaws
     const gripperBaseGeo = new THREE.BoxGeometry(42, 12, 18);
     const gripperBase = new THREE.Mesh(gripperBaseGeo, brassBearingMat);
     gripperBase.position.y = 32;
     j5Group.add(gripperBase);
 
-    // Left Finger Assembly
+    // Left Finger
     const leftFingerGroup = new THREE.Group();
     leftFingerGroup.position.set(-11, 44, 0);
     j5Group.add(leftFingerGroup);
@@ -354,8 +361,8 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     const fingerMainLeft = new THREE.Mesh(fingerMainLeftGeo, darkMetalMat);
     leftFingerGroup.add(fingerMainLeft);
 
-    const gripPadLeftGeo = new THREE.BoxGeometry(4, 24, 8);
-    const gripPadLeft = new THREE.Mesh(gripPadLeftGeo, rubberGripMat.clone());
+    const gripPadLeftGeo = new THREE.BoxGeometry(5, 24, 8);
+    const gripPadLeft = new THREE.Mesh(gripPadLeftGeo, gripperMat.clone());
     gripPadLeft.position.set(4, 0, 0);
     gripPadLeft.userData = {
       jointKey: 'gripper',
@@ -368,7 +375,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     leftFingerGroup.add(gripPadLeft);
     intersectables.push(gripPadLeft);
 
-    // Right Finger Assembly
+    // Right Finger
     const rightFingerGroup = new THREE.Group();
     rightFingerGroup.position.set(11, 44, 0);
     j5Group.add(rightFingerGroup);
@@ -378,8 +385,8 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     const fingerMainRight = new THREE.Mesh(fingerMainRightGeo, darkMetalMat);
     rightFingerGroup.add(fingerMainRight);
 
-    const gripPadRightGeo = new THREE.BoxGeometry(4, 24, 8);
-    const gripPadRight = new THREE.Mesh(gripPadRightGeo, rubberGripMat.clone());
+    const gripPadRightGeo = new THREE.BoxGeometry(5, 24, 8);
+    const gripPadRight = new THREE.Mesh(gripPadRightGeo, gripperMat.clone());
     gripPadRight.position.set(-4, 0, 0);
     gripPadRight.userData = gripPadLeft.userData;
     rightFingerGroup.add(gripPadRight);
@@ -390,7 +397,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     // Target Marker Sphere for IK Target Mode
     const targetGeo = new THREE.SphereGeometry(9, 20, 20);
     const targetMat = new THREE.MeshBasicMaterial({
-      color: 0xd93025,
+      color: 0xff3b30,
       wireframe: true
     });
     const targetMarker = new THREE.Mesh(targetGeo, targetMat);
@@ -398,9 +405,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     scene.add(targetMarker);
     jointsRef.current.targetMarker = targetMarker;
 
-    // ------------------------------------------------------------------------
-    // 8. Raycasting Mouse Hover Inspection & Smooth Orbit Controls
-    // ------------------------------------------------------------------------
+    // 8. Raycasting & Mouse Interaction
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let isDragging = false;
@@ -451,7 +456,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
               originalEmissive: mat.emissive.clone()
             };
           }
-          mat.emissive.setHex(0x0b57d0);
+          mat.emissive.setHex(0x2563eb);
 
           setHoveredJoint({
             jointKey: hitMesh.userData.jointKey,
@@ -553,7 +558,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     }
   }, [angles, targetPos, isIKMode]);
 
-  // Camera Presets (Isometric, Top, Side, Front)
+  // Camera Presets
   const setCameraPreset = (view: 'iso' | 'top' | 'side' | 'front') => {
     if (!cameraRef.current) return;
     const cam = cameraRef.current;
@@ -591,7 +596,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
         <Layers size={14} /> 3D DIGITAL TWIN • 60 FPS
       </div>
 
-      {/* Floating Camera View Angle Controls */}
+      {/* Floating Camera Controls */}
       <div className="camera-controls-overlay">
         <button className="btn-cam" onClick={() => setCameraPreset('iso')}>Isometric</button>
         <button className="btn-cam" onClick={() => setCameraPreset('top')}>Top</button>
@@ -599,7 +604,7 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
         <button className="btn-cam" onClick={() => setCameraPreset('front')}>Front</button>
       </div>
 
-      {/* Raycasting Hover Tooltip Card */}
+      {/* Hover Inspection Tooltip */}
       {hoveredJoint && (
         <div
           className="3d-hover-tooltip"
