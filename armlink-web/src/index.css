@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root,
+[data-theme='light'] {
+  /* Material Design 3 Light Mode Palette (Default) */
+  --md-sys-color-background: #f8f9fa;
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-surface-container: #ffffff;
+  --md-sys-color-surface-variant: #f1f3f4;
+  --md-sys-color-surface-bright: #e9ecef;
+  --md-sys-color-outline: #dadce0;
+  --md-sys-color-outline-variant: #e0e0e0;
+
+  --md-sys-color-primary: #0b57d0;       /* Google Blue */
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d3e3fd;
+  --md-sys-color-on-primary-container: #041e49;
+
+  --md-sys-color-secondary: #5f6368;
+  --md-sys-color-secondary-container: #e8eaed;
+  --md-sys-color-on-secondary-container: #1f1f1f;
+
+  --md-sys-color-error: #d93025;         /* Google Red */
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #fce8e6;
+  --md-sys-color-on-error-container: #c5221f;
+
+  --md-sys-color-success: #188038;       /* Google Green */
+  --md-sys-color-success-container: #e6f4ea;
+  --md-sys-color-on-success-container: #137333;
+
+  --md-sys-color-warning: #f29900;       /* Google Amber */
+  --md-sys-color-warning-container: #fef7e0;
+  --md-sys-color-on-warning-container: #b06000;
+
+  --md-sys-color-on-surface: #1f1f1f;
+  --md-sys-color-on-surface-variant: #444746;
+  --md-sys-color-on-surface-dim: #70757a;
+
+  /* Material Elevations & Shadows */
+  --md-elevation-1: 0px 1px 3px 0px rgba(60, 64, 67, 0.15), 0px 1px 2px 0px rgba(60, 64, 67, 0.1);
+  --md-elevation-2: 0px 2px 6px 2px rgba(60, 64, 67, 0.15), 0px 1px 2px 0px rgba(60, 64, 67, 0.1);
+  --md-elevation-3: 0px 4px 8px 3px rgba(60, 64, 67, 0.15), 0px 1px 3px 0px rgba(60, 64, 67, 0.1);
+  --md-elevation-4: 0px 6px 10px 4px rgba(60, 64, 67, 0.15), 0px 2px 3px 0px rgba(60, 64, 67, 0.1);
+
+  /* Material Radii */
+  --md-radius-sm: 8px;
+  --md-radius-md: 16px;
+  --md-radius-lg: 24px;
+  --md-radius-full: 9999px;
+
+  /* Fonts */
+  --font-sans: 'Google Sans', 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme='dark'] {
+  /* Material Design 3 Dark Mode Palette */
+  --md-sys-color-background: #0f172a;
+  --md-sys-color-surface: #1e293b;
+  --md-sys-color-surface-container: #1e293b;
+  --md-sys-color-surface-variant: #334155;
+  --md-sys-color-surface-bright: #475569;
+  --md-sys-color-outline: rgba(255, 255, 255, 0.15);
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.1);
+
+  --md-sys-color-primary: #8ab4f8;
+  --md-sys-color-on-primary: #041e49;
+  --md-sys-color-primary-container: #1a73e8;
+  --md-sys-color-on-primary-container: #e8eaed;
+
+  --md-sys-color-secondary: #94a3b8;
+  --md-sys-color-secondary-container: #334155;
+  --md-sys-color-on-secondary-container: #f8fafc;
+
+  --md-sys-color-error: #f28b82;
+  --md-sys-color-on-error: #601210;
+  --md-sys-color-error-container: #8c1d18;
+  --md-sys-color-on-error-container: #fce8e6;
+
+  --md-sys-color-success: #81c995;
+  --md-sys-color-success-container: #0d652d;
+  --md-sys-color-on-success-container: #e6f4ea;
+
+  --md-sys-color-warning: #fdd663;
+  --md-sys-color-warning-container: #e37400;
+  --md-sys-color-on-warning-container: #fef7e0;
+
+  --md-sys-color-on-surface: #f8fafc;
+  --md-sys-color-on-surface-variant: #cbd5e1;
+  --md-sys-color-on-surface-dim: #94a3b8;
+
+  --md-elevation-1: 0px 1px 3px 0px rgba(0, 0, 0, 0.3);
+  --md-elevation-2: 0px 4px 8px 0px rgba(0, 0, 0, 0.4);
+  --md-elevation-3: 0px 8px 16px 0px rgba(0, 0, 0, 0.5);
+  --md-elevation-4: 0px 12px 24px 0px rgba(0, 0, 0, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--md-sys-color-background);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
