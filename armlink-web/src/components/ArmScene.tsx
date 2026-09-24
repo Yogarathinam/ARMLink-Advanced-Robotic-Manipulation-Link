@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import type { JointAngles, Vector3D } from '../robot/kinematics';
-import { Cpu, Layers } from 'lucide-react';
+import { getArmStoreState } from '../state/armStore';
+import { Cpu, Layers, MousePointerClick } from 'lucide-react';
 
 interface ArmSceneProps {
   angles: JointAngles;
@@ -10,6 +11,7 @@ interface ArmSceneProps {
   showGrid?: boolean;
   isIKMode?: boolean;
   theme?: 'light' | 'dark';
+  selectedJointKey?: keyof JointAngles | null;
 }
 
 export interface HoveredJointData {
@@ -30,7 +32,8 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
   showAxes = true,
   showGrid = true,
   isIKMode = false,
-  theme = 'light'
+  theme = 'light',
+  selectedJointKey
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -405,16 +408,18 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     scene.add(targetMarker);
     jointsRef.current.targetMarker = targetMarker;
 
-    // 8. Raycasting & Mouse Interaction
+    // 8. Raycasting & Mouse Interaction (Orbit + Click Selection)
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
     let isDragging = false;
+    let mouseDownPos = { x: 0, y: 0 };
     let previousMousePosition = { x: 0, y: 0 };
 
     const domElem = renderer.domElement;
 
     const onMouseDown = (e: MouseEvent) => {
       isDragging = true;
+      mouseDownPos = { x: e.clientX, y: e.clientY };
       previousMousePosition = { x: e.clientX, y: e.clientY };
     };
 
@@ -484,8 +489,28 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
       domElem.style.cursor = 'default';
     };
 
-    const onMouseUp = () => {
+    const onMouseUp = (e: MouseEvent) => {
       isDragging = false;
+      const deltaX = Math.abs(e.clientX - mouseDownPos.x);
+      const deltaY = Math.abs(e.clientY - mouseDownPos.y);
+
+      // If mouse barely moved, treat as 3D Joint Selection Click
+      if (deltaX < 5 && deltaY < 5) {
+        const rect = domElem.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(intersectableMeshesRef.current, false);
+
+        if (intersects.length > 0) {
+          const hitMesh = intersects[0].object as THREE.Mesh;
+          if (hitMesh.userData && hitMesh.userData.jointKey) {
+            getArmStoreState().setSelectedJointKey(hitMesh.userData.jointKey as keyof JointAngles);
+          }
+        } else {
+          getArmStoreState().setSelectedJointKey(null);
+        }
+      }
     };
 
     domElem.addEventListener('mousedown', onMouseDown);
@@ -558,6 +583,24 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
     }
   }, [angles, targetPos, isIKMode]);
 
+  // Highlight selected joint in 3D scene
+  useEffect(() => {
+    intersectableMeshesRef.current.forEach((mesh) => {
+      const mat = mesh.material as THREE.MeshStandardMaterial;
+      if (selectedJointKey && mesh.userData && mesh.userData.jointKey === selectedJointKey) {
+        mat.emissive.setHex(0x00f0ff); // Bright Cyan selection glow
+      } else {
+        if (mesh.userData && mesh.userData.jointKey === 'base' || mesh.userData.jointKey === 'shoulder' || mesh.userData.jointKey === 'elbow') {
+          mat.emissive.setHex(0x0d47a1);
+        } else if (mesh.userData && mesh.userData.jointKey === 'gripper') {
+          mat.emissive.setHex(0x991b1b);
+        } else {
+          mat.emissive.setHex(0x000000);
+        }
+      }
+    });
+  }, [selectedJointKey]);
+
   // Camera Presets
   const setCameraPreset = (view: 'iso' | 'top' | 'side' | 'front') => {
     if (!cameraRef.current) return;
@@ -591,9 +634,14 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
         overflow: 'hidden'
       }}
     >
-      {/* 3D Digital Twin Badge */}
+      {/* 3D Digital Twin Badge & Selection Indicator */}
       <div className="canvas-overlay-badge">
         <Layers size={14} /> 3D DIGITAL TWIN • 60 FPS
+        {selectedJointKey && (
+          <span style={{ marginLeft: '0.5rem', color: '#00f0ff', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+            <MousePointerClick size={12} /> Selected: {selectedJointKey.toUpperCase()}
+          </span>
+        )}
       </div>
 
       {/* Floating Camera Controls */}
@@ -650,6 +698,9 @@ export const ArmScene: React.FC<ArmSceneProps> = ({
             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--md-sys-color-on-surface-variant)' }}>
               <span>Axis:</span>
               <span>{hoveredJoint.axis}</span>
+            </div>
+            <div style={{ marginTop: '0.3rem', color: 'var(--md-sys-color-primary)', fontSize: '0.7rem', textAlign: 'center', fontStyle: 'italic' }}>
+              Click joint to select & focus
             </div>
           </div>
         </div>

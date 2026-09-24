@@ -82,13 +82,15 @@ export const JointControls: React.FC<JointControlsProps> = ({ store }) => {
           const currentAngle = store.angles[jointKey];
           const limits = store.jointLimits[jointKey];
           const isAtLimit = currentAngle <= limits.min || currentAngle >= limits.max;
+          const isSelected = store.selectedJointKey === jointKey;
 
           return (
-            <div key={jointKey} className={`joint-row ${isAtLimit ? 'at-limit' : ''}`}>
+            <div key={jointKey} className={`joint-row ${isSelected ? 'selected-3d' : ''} ${isAtLimit ? 'at-limit' : ''}`}>
               <div className="joint-meta">
                 <div className="joint-name-box">
                   <span className="joint-title">{info.label}</span>
                   <span className="joint-badge">{info.motor}</span>
+                  {isSelected && <span className="joint-badge" style={{ background: 'var(--md-sys-color-primary)', color: '#fff' }}>Selected in 3D</span>}
                 </div>
                 <div className="joint-val-box">
                   {isAtLimit && (

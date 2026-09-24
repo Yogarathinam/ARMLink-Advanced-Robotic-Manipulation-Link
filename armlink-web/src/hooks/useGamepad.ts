@@ -63,7 +63,7 @@ export function useGamepad() {
         });
 
         const store = getArmStoreState();
-        if (store.controlMode === 'gamepad' && !store.estopActive) {
+        if ((store.controlMode === 'gamepad' || store.controlMode === 'sequence') && !store.estopActive) {
           // Velocity control mapping:
           // Left Stick X -> Base Rotate
           // Left Stick Y -> Shoulder Pitch

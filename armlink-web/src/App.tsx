@@ -40,6 +40,7 @@ export function App() {
               targetPos={storeState.endEffectorPos}
               isIKMode={storeState.controlMode === 'ik'}
               theme={storeState.theme}
+              selectedJointKey={storeState.selectedJointKey}
             />
 
             <div className="telemetry-bar">

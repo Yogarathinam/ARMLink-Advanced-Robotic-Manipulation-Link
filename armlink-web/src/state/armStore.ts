@@ -24,6 +24,10 @@ export interface ArmStoreState {
   theme: ThemeMode;
   setTheme: (theme: ThemeMode) => void;
 
+  // Selected Joint from 3D Model Click
+  selectedJointKey: keyof JointAngles | null;
+  setSelectedJointKey: (joint: keyof JointAngles | null) => void;
+
   // Joint Angles & Kinematics
   angles: JointAngles;
   targetAngles: JointAngles;
@@ -140,6 +144,12 @@ state = {
   setTheme: (newTheme) => {
     state.theme = newTheme;
     document.documentElement.setAttribute('data-theme', newTheme);
+    emitChange();
+  },
+
+  selectedJointKey: null,
+  setSelectedJointKey: (joint) => {
+    state.selectedJointKey = joint;
     emitChange();
   },
 

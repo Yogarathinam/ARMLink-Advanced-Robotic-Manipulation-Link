@@ -90,6 +90,21 @@ export function useKeyboardControls() {
         case 'h':
           transportManager.sendHome();
           break;
+
+        // Capture Pose in Sequence Mode: C or Enter key
+        case 'c':
+        case 'enter':
+          if (store.controlMode === 'sequence') {
+            const nextStepNum = store.activeSequence.length + 1;
+            const newStep = {
+              id: `step_${Date.now()}`,
+              name: `Step ${nextStepNum}`,
+              angles: { ...store.angles },
+              duration: 1000
+            };
+            store.setSequence([...store.activeSequence, newStep]);
+          }
+          break;
       }
 
       if (changed) {

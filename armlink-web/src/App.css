@@ -251,10 +251,11 @@
 /* Workspace Grid Layout */
 .workspace {
   display: grid;
-  grid-template-columns: 1fr 460px;
+  grid-template-columns: 1fr 480px;
   gap: 1.5rem;
   padding: 1.5rem;
   flex: 1;
+  align-items: start;
 }
 
 @media (max-width: 1100px) {
@@ -300,21 +301,34 @@
   color: var(--md-sys-color-primary);
 }
 
-/* Viewport Section */
+/* Sticky Viewport Section */
 .viewport-section {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  position: sticky;
+  top: 85px;
+  max-height: calc(100vh - 105px);
+  overflow-y: auto;
+}
+
+@media (max-width: 1100px) {
+  .viewport-section {
+    position: relative;
+    top: 0;
+    max-height: none;
+  }
 }
 
 .viewport-card {
-  height: 560px;
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   padding: 0.5rem;
   position: relative;
   overflow: hidden;
   border-radius: var(--md-radius-md);
+  flex-shrink: 0;
 }
 
 .canvas-overlay-badge {
@@ -442,6 +456,12 @@
 .joint-row:hover {
   border-color: var(--md-sys-color-primary);
   box-shadow: var(--md-elevation-1);
+}
+
+.joint-row.selected-3d {
+  border: 2px solid var(--md-sys-color-primary);
+  background: var(--md-sys-color-primary-container);
+  box-shadow: 0 0 12px rgba(11, 87, 208, 0.25);
 }
 
 .joint-row.at-limit {
